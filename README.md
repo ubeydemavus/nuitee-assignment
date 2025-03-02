@@ -636,8 +636,8 @@ The system provides explainability through:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/room-matching-api.git
-cd room-matching-api
+git clone https://github.com/ubeydemavus/nuitee-assignment.git
+cd nuitee-assignment
 ```
 
 2. Install dependencies:
