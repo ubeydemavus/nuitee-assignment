@@ -1,0 +1,38 @@
+```mermaid
+flowchart TD
+    start([START]) --> twoTrack{Pipeline Stage}
+    
+    twoTrack --> |Model Training| finetuneTrack[Fine-tune GLiNER]
+    twoTrack --> |Data Processing| pretrainTrack[Preprocess Data]
+    
+    subgraph finetune[Fine-tuning Process]
+        finetuneTrack --> loadTrainData[Load training data]
+        loadTrainData --> splitData[Split train/test]
+        splitData --> trainModel[Train GLiNER model]
+        trainModel --> saveModel[Save model checkpoint]
+    end
+    
+    subgraph pretrain[Data Preprocessing]
+        pretrainTrack --> loadRoomData[Load room datasets]
+        loadRoomData --> processRooms[Extract entities<br/>from room names]
+        processRooms --> createEmbeds[Generate embeddings]
+        createEmbeds --> clusterSimilar[Cluster similar terms]
+        clusterSimilar --> buildSynonyms[Build synonym dictionary]
+        buildSynonyms --> saveData[Save processed data]
+    end
+    
+    finetune --> production[Production Deployment]
+    pretrain --> production
+    
+    subgraph deploy[Production API]
+        production --> initAPI[Initialize API]
+        initAPI --> loadResources[Load models<br/>and preprocessed data]
+        loadResources --> serveRequests[Serve room<br/>matching requests]
+    end
+    
+    deploy --> endFlow([END])
+
+    style finetune fill:#f9f,stroke:#333,stroke-width:2px
+    style pretrain fill:#bbf,stroke:#333,stroke-width:2px
+    style deploy fill:#bfb,stroke:#333,stroke-width:2px
+``` 

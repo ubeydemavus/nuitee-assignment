@@ -1,0 +1,74 @@
+```mermaid
+flowchart TD
+    start([START]) --> request[Room Match Request]
+    request --> load[Load Data]
+    
+    subgraph init[Data Init]
+        load --> ref[Load ref rooms]
+        load --> core[Load core rooms]
+        load --> syn[Load synonyms]
+        load --> emb[Load embeddings]
+        emb --> uf[Init UnionFind]
+    end
+    
+    init --> processRef[Process Ref Catalog]
+    
+    subgraph refProc[Ref Processing]
+        processRef --> |For each ref room| checkRef{In ref_df?}
+        checkRef --> |Yes| getRef[Get cached NERs]
+        checkRef --> |No| extRef[Extract NERs<br/>using GLiNER]
+        getRef --> storeRef[Store in<br/>refs_retrieved]
+        extRef --> storeRef
+    end
+    
+    refProc --> processInput[Process Input Catalog]
+    
+    subgraph inputProc[Input Processing]
+        processInput --> |For each input room| checkInput{In core_df?}
+        checkInput --> |Yes| getInput[Get cached NERs]
+        checkInput --> |No| extInput[Extract NERs<br/>using GLiNER]
+        getInput --> storeInput[Store in<br/>cats_retrieved]
+        extInput --> storeInput
+    end
+    
+    inputProc --> matching[Match Rooms]
+    
+    subgraph matchProc[Matching Process]
+        matching --> |For each ref room| forRef[Process ref room]
+        forRef --> |For each input room| forInput[Process input room]
+        forInput --> exact{Exact match?<br/>LP IDs or names}
+        exact --> |Yes| score1[Score = 1.0]
+        exact --> |No| calcSim[Calc similarity]
+        
+        subgraph simCalc[Similarity Calc]
+            calcSim --> |For each category| entLoop[Process category]
+            entLoop --> |For each ref entity| refEntLoop[Process ref entity]
+            refEntLoop --> |For each input entity| inEntLoop[Process input entity]
+            inEntLoop --> syn{Are synonyms?}
+            syn --> |Yes| maxScore[Take max score]
+            syn --> |No| cosSim[Calc cosine<br/>similarity]
+            cosSim --> scaleByCon[Scale by<br/>confidence]
+            maxScore --> addScores[Add to scores]
+            scaleByCon --> addScores
+            addScores --> avgCat[Calc category<br/>average]
+        end
+        
+        simCalc --> calcWt[Calculate weighted score]
+        calcWt --> |Apply weights| wtScore[roomType: 2/6<br/>others: 1/6 each]
+        wtScore --> threshold{Score >= 0.1?}
+        score1 --> addMatch[Add to matches]
+        threshold --> |Yes| addMatchScore[Add to matches<br/>with score]
+        threshold --> |No| discard[Discard match]
+        addMatchScore --> nextInput[Next input]
+        discard --> nextInput
+        addMatch --> nextInput
+        nextInput --> nextRef[Next reference]
+    end
+    
+    matchProc --> genResp[Generate Response]
+    genResp --> formatMatch[Format matches]
+    formatMatch --> idUnmap[Identify unmapped]
+    idUnmap --> conResp[Construct response]
+    conResp --> retRes[Return Results]
+    retRes --> endFlow([END])
+``` 

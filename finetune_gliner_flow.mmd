@@ -1,0 +1,47 @@
+```mermaid
+flowchart TD
+    start([START]) --> loadData[Load Training Data]
+    
+    subgraph dataPrep[Data Preparation]
+        loadData --> readJSON[Read JSON<br/>training data]
+        readJSON --> shuffle[Shuffle dataset]
+        shuffle --> split[Split into train<br/>and test sets]
+    end
+    
+    dataPrep --> loadModel[Load Pretrained Model]
+    
+    subgraph modelInit[Model Initialization]
+        loadModel --> baseModel[Load GLiNER<br/>pretrained model]
+        baseModel --> setupCollator[Initialize<br/>data collator]
+        setupCollator --> moveToDevice[Move model<br/>to GPU/CPU]
+    end
+    
+    modelInit --> configTraining[Configure Training]
+    
+    subgraph trainConfig[Training Configuration]
+        configTraining --> setBatchSize[Set batch size]
+        setBatchSize --> calcSteps[Calculate<br/>training steps]
+        calcSteps --> setupArgs[Set training<br/>arguments]
+        setupArgs --> setLR[Set learning rate<br/>and scheduler]
+        setLR --> setLoss[Configure<br/>focal loss]
+    end
+    
+    trainConfig --> initTrainer[Initialize Trainer]
+    
+    subgraph trainer[Trainer Setup]
+        initTrainer --> createTrainer[Create Trainer<br/>instance]
+        createTrainer --> configSave[Configure<br/>checkpointing]
+    end
+    
+    trainer --> runTraining[Run Training]
+    
+    subgraph training[Training Process]
+        runTraining --> batchIter[Process<br/>batches]
+        batchIter --> evalSteps[Evaluate at<br/>intervals]
+        evalSteps --> saveChkpt[Save model<br/>checkpoints]
+    end
+    
+    training --> modelSaved[Model Saved to Disk]
+    modelSaved --> useTip[Model can be loaded<br/>from checkpoint]
+    useTip --> endFlow([END])
+``` 

@@ -1,0 +1,19 @@
+pandas
+numpy
+scikit-learn
+gliner
+sentence-transformers
+matplotlib
+umap-learn
+fastapi[all]
+uvicorn[standard]
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-dotenv
+httpx
+accelerate
+
+--extra-index-url https://download.pytorch.org/whl/cu126
+torch
+torchvision
+torchaudio

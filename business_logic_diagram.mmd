@@ -1,0 +1,95 @@
+```mermaid
+classDiagram
+    class RoomMatcher {
+        +match_threshold
+        +label_weights
+        +labels
+        +ref_df
+        +core_df
+        +ref_d
+        +core_d
+        +synonym_dict
+        +embeds
+        +union_find
+        +ners_model
+        +embedding_model
+        +init()
+        +_init_models()
+        +_load_data()
+        +build_synonyms()
+        +are_similar()
+        +extract_entities()
+        +get_final_score()
+        +process_match_request()
+    }
+    
+    class UnionFind {
+        +parent
+        +init()
+        +find()
+        +union()
+    }
+    
+    class RoomMatchRequest {
+        +referenceCatalog
+        +inputCatalog
+    }
+    
+    class ReferenceRoom {
+        +hotel_id
+        +lp_id
+        +room_id
+        +room_name
+    }
+    
+    class InputRoom {
+        +hotel_id
+        +lp_id
+        +supplier_room_id
+        +supplier_name
+        +supplier_room_name
+    }
+    
+    class RoomMatchResponse {
+        +results
+        +unmapped_rooms
+    }
+    
+    class MatchResult {
+        +room_name
+        +room_id
+        +hotel_id
+        +lp_id
+        +mapped_rooms
+    }
+    
+    class MappedRoom {
+        +core_room_id
+        +core_hotel_id
+        +lp_id
+        +supplier_room_id
+        +supplier_name
+        +supplier_room_name
+        +ners
+        +match_score
+    }
+    
+    class UnmappedRoom {
+        +core_room_id
+        +core_hotel_id
+        +lp_id
+        +supplier_room_id
+        +supplier_name
+        +supplier_room_name
+        +ners
+    }
+    
+    RoomMatcher -- UnionFind : uses
+    RoomMatchRequest --|> ReferenceRoom : has
+    RoomMatchRequest --|> InputRoom : has
+    RoomMatchResponse --|> MatchResult : contains
+    RoomMatchResponse --|> UnmappedRoom : contains
+    MatchResult --|> MappedRoom : contains
+    RoomMatcher --> RoomMatchRequest : processes
+    RoomMatcher --> RoomMatchResponse : produces
+``` 

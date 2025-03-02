@@ -1,0 +1,64 @@
+```mermaid
+flowchart TD
+    start([START]) --> initModels[Initialize NLP Models]
+    
+    subgraph modelInit[Model Initialization]
+        initModels --> loadGLiNER[Load GLiNER<br/>NER Model]
+        initModels --> loadSentence[Load Sentence<br/>Transformer]
+    end
+    
+    modelInit --> loadData[Load Datasets]
+    
+    subgraph dataLoad[Data Loading]
+        loadData --> loadRefDF[Load reference<br/>rooms CSV]
+        loadData --> loadCoreDF[Load core<br/>rooms CSV]
+    end
+    
+    dataLoad --> processRef[Process Reference Data]
+    
+    subgraph refProcessing[Reference Processing]
+        processRef --> |Batch processing| extractRefNER[Extract NERs<br/>with GLiNER]
+        extractRefNER --> structRefNER[Structure NER<br/>results]
+        structRefNER --> saveRefData[Save to<br/>refrooms_processed.p]
+    end
+    
+    refProcessing --> processCore[Process Core Data]
+    
+    subgraph coreProcessing[Core Processing]
+        processCore --> |Batch processing| extractCoreNER[Extract NERs<br/>with GLiNER]
+        extractCoreNER --> structCoreNER[Structure NER<br/>results]
+        structCoreNER --> saveCoreData[Save to<br/>corerooms_processed.p]
+    end
+    
+    coreProcessing --> extractUnique[Extract Unique NER Terms]
+    
+    subgraph uniqueTerms[Unique Terms]
+        extractUnique --> |All entity types| uniqueSet[Collect unique<br/>entity terms]
+    end
+    
+    uniqueTerms --> genEmbeddings[Generate Embeddings]
+    
+    subgraph embeddingGen[Embedding Generation]
+        genEmbeddings --> vectorize[Create vectors<br/>for all terms]
+    end
+    
+    embeddingGen --> cluster[Cluster Similar Terms]
+    
+    subgraph clustering[Clustering Process]
+        cluster --> elbowMethod[Find optimal<br/>K with elbow method]
+        elbowMethod --> runKMeans[Run KMeans<br/>clustering]
+        runKMeans --> refine[Refine clusters<br/>with similarity check]
+        refine --> visualize[Visualize with<br/>UMAP]
+    end
+    
+    clustering --> createSynonyms[Create Synonym Dictionary]
+    
+    subgraph synonymDict[Synonym Dictionary]
+        createSynonyms --> groupWords[Group similar<br/>words]
+        groupWords --> saveSynonyms[Save to<br/>similar_dict.p]
+    end
+    
+    synonymDict --> saveEmbeddings[Save Embeddings]
+    saveEmbeddings --> storeEmbed[Save to<br/>embeddings.p]
+    storeEmbed --> endFlow([END])
+``` 

@@ -1,0 +1,35 @@
+```mermaid
+flowchart TD
+    start([START]) --> inputRoom[Room Name Input]
+    inputRoom --> gliner[GLiNER Model]
+    
+    subgraph predProc[Entity Prediction]
+        gliner --> predict[Predict entities<br/>with scores]
+        predict --> |For each entity| catg[Categorize]
+    end
+    
+    catg --> entType{Entity Type}
+    entType --> |roomType| rType[Suite,<br/>Apartment]
+    entType --> |classType| cType[Deluxe,<br/>Standard]
+    entType --> |bedCount| bCount[2, Double]
+    entType --> |view| view[Ocean,<br/>Garden]
+    entType --> |bedType| bType[King, Twin]
+    entType --> |features| feat[Balcony,<br/>Kitchen]
+    
+    rType --> struct[Structure NERs]
+    cType --> struct
+    bCount --> struct
+    view --> struct
+    bType --> struct
+    feat --> struct
+    
+    struct --> embGen[Generate<br/>Embeddings]
+    
+    subgraph embProc[Embedding Gen]
+        embGen --> |For each entity| create[Create<br/>embedding]
+        create --> store[Store in<br/>dictionary]
+    end
+    
+    embProc --> returnNER[Return NERs]
+    returnNER --> endFlow([END])
+``` 

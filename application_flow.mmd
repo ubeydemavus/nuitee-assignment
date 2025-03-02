@@ -1,0 +1,47 @@
+```mermaid
+flowchart TD
+    start([START]) --> httpReq[HTTP Request<br/>/room_match]
+    httpReq --> validation[Validate Request]
+    
+    subgraph validProc[Validation]
+        validation --> pydVal[Pydantic<br/>validation]
+        pydVal --> schemaVal[Schema<br/>validation]
+        schemaVal --> valid{Valid?}
+        valid --> |No| valErr[Return 422<br/>Validation Error]
+        valid --> |Yes| contProc[Continue]
+    end
+    
+    validProc --> initSvc[Init RoomMatcher]
+    
+    subgraph svcInit[Service Init]
+        initSvc --> loadMod[Load NLP models]
+        loadMod --> loadCache[Load cached data]
+    end
+    
+    svcInit --> convData[Convert Data]
+    convData --> transModels[Transform to dicts]
+    transModels --> callAlgo[Call Algorithm]
+    
+    subgraph algoProc[Algorithm]
+        callAlgo --> procRef[Process ref<br/>catalog]
+        procRef --> procInput[Process input<br/>catalog]
+        procInput --> perfMatch[Perform<br/>matching]
+        perfMatch --> genRes[Generate<br/>results]
+    end
+    
+    algoProc --> formatResp[Format Response]
+    
+    subgraph respProc[Response Format]
+        formatResp --> valResp[Validate<br/>response]
+        valResp --> structRes[Structure<br/>results]
+    end
+    
+    respProc --> errCheck{Errors?}
+    errCheck --> |Yes| srvErr[Return 500<br/>Error]
+    errCheck --> |No| sucResp[Return 200<br/>Success]
+    srvErr --> endErr[HTTP Error<br/>Response]
+    sucResp --> endSuc[HTTP Success<br/>Response]
+    endErr --> endFlow([END])
+    endSuc --> endFlow
+    valErr --> endFlow
+``` 
